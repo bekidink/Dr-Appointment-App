@@ -8,19 +8,23 @@ import { InputWithIcon } from '~/components/inputs/InputWithIcon';
 import CustomButton from '~/components/CustomButton';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { useRouter } from 'expo-router';
+import { Stack } from 'expo-router';
+import CustomDatePicker from '~/components/inputs/CustomDatePicker';
+import CustomDropdown from '~/components/inputs/CustomDropDown';
 
 const schema = z.object({
   email: z.string().email('Please enter a valid email'),
   name: z.string().min(1, 'Name is required'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
+  dob: z.date({ required_error: 'Date of birth is required' }),
+  selectedOption: z.string().min(1, 'Please select an option'),
 });
 
 type FormData = z.infer<typeof schema>;
 
-const SignUp = () => {
+const OnBoardingProfile = () => {
   const navigation = useNavigation();
-const router = useRouter();
+
   const {
     handleSubmit,
     setValue,
@@ -34,14 +38,19 @@ const router = useRouter();
       password: '',
     },
   });
+const options = [
+  { label: 'Option 1', value: 'option1' },
+  { label: 'Option 2', value: 'option2' },
+  { label: 'Option 3', value: 'option3' },
+];
 
   const onSubmit = (data: FormData) => {
     console.log('Submitted', data);
-   router.replace('/auth/sign-in');
   };
 
   return (
     <View className="flex-1 bg-white">
+      <Stack.Screen options={{ headerShown: true, title: 'Fill Your Profile' }} />
       {/* Logo & Titles */}
       <View className="mt-16 items-center justify-center">
         <Image source={AppIcon} style={{ width: 50, height: 50 }} resizeMode="contain" />
@@ -53,31 +62,40 @@ const router = useRouter();
       {/* Form */}
       <View className="mx-5 mt-5">
         <InputWithIcon
-          icon="user"
           placeholder="Your Name"
           value={watch('name')}
           onChangeText={(text) => setValue('name', text, { shouldValidate: true })}
           error={errors.name?.message}
         />
         <InputWithIcon
-          icon="mail"
+          placeholder="Nick Name"
+          value={watch('name')}
+          onChangeText={(text) => setValue('name', text, { shouldValidate: true })}
+          error={errors.name?.message}
+        />
+        <InputWithIcon
           placeholder="Your Email"
           value={watch('email')}
           onChangeText={(text) => setValue('email', text, { shouldValidate: true })}
           error={errors.email?.message}
         />
-        <InputWithIcon
-          icon="key"
-          placeholder="Password"
-          value={watch('password')}
-          onChangeText={(text) => setValue('password', text, { shouldValidate: true })}
-          error={errors.password?.message}
+        <CustomDatePicker
+          value={watch('dob')}
+          onChange={(date) => setValue('dob', date, { shouldValidate: true })}
+          placeholder="Date of Birth"
+          error={errors.dob?.message}
         />
-
+        <CustomDropdown
+          value={watch('selectedOption')}
+          onChange={(value) => setValue('selectedOption', value, { shouldValidate: true })}
+          options={options}
+          placeholder="Choose an option"
+          error={errors.selectedOption?.message}
+        />
         <CustomButton
-          title="Create Account"
+          title="Save"
           onPress={handleSubmit(onSubmit)}
-          className="mt-4 py-3 rounded-full bg-[#111928]"
+          className="mt-4 rounded-full bg-[#111928] py-3"
         />
 
         {/* Dash Separator */}
@@ -115,4 +133,4 @@ const router = useRouter();
   );
 };
 
-export default SignUp;
+export default OnBoardingProfile;

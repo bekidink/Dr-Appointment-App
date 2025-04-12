@@ -23,7 +23,7 @@ export default function OnboardingScreen() {
   };
 
   const skipOnboarding = () => {
-    router.replace('/auth/sign-up');
+    router.replace('/auth/sign-in');
   };
 
   const handleScroll = (event: any) => {

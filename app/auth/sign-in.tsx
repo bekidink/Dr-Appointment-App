@@ -12,13 +12,12 @@ import { useRouter } from 'expo-router';
 
 const schema = z.object({
   email: z.string().email('Please enter a valid email'),
-  name: z.string().min(1, 'Name is required'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
 type FormData = z.infer<typeof schema>;
 
-const SignUp = () => {
+const SignIn = () => {
   const navigation = useNavigation();
 const router = useRouter();
   const {
@@ -30,14 +29,13 @@ const router = useRouter();
     resolver: zodResolver(schema),
     defaultValues: {
       email: '',
-      name: '',
       password: '',
     },
   });
 
   const onSubmit = (data: FormData) => {
     console.log('Submitted', data);
-   router.replace('/auth/sign-in');
+   router.replace('/auth/profile-onboarding');
   };
 
   return (
@@ -46,19 +44,12 @@ const router = useRouter();
       <View className="mt-16 items-center justify-center">
         <Image source={AppIcon} style={{ width: 50, height: 50 }} resizeMode="contain" />
         <Text className="mt-3 text-2xl font-bold text-[#6B7280]">HealthPal</Text>
-        <Text className="mt-5 text-2xl font-bold text-[#1C2A3A]">Create Account</Text>
-        <Text className="mt-2 text-base font-medium text-[#6B7280]">We are here to help you!</Text>
+        <Text className="mt-5 text-2xl font-bold text-[#1C2A3A]">Hi, Welcome Back! </Text>
+        <Text className="mt-2 text-base font-medium text-[#6B7280]">Hope you’re doing fine.</Text>
       </View>
 
       {/* Form */}
       <View className="mx-5 mt-5">
-        <InputWithIcon
-          icon="user"
-          placeholder="Your Name"
-          value={watch('name')}
-          onChangeText={(text) => setValue('name', text, { shouldValidate: true })}
-          error={errors.name?.message}
-        />
         <InputWithIcon
           icon="mail"
           placeholder="Your Email"
@@ -75,9 +66,9 @@ const router = useRouter();
         />
 
         <CustomButton
-          title="Create Account"
+          title="Sign In"
           onPress={handleSubmit(onSubmit)}
-          className="mt-4 py-3 rounded-full bg-[#111928]"
+          className="mt-4 rounded-full bg-[#111928] py-3"
         />
 
         {/* Dash Separator */}
@@ -97,17 +88,25 @@ const router = useRouter();
           <Feather name="globe" size={20} color="#DB4437" />
           <Text className="ml-2 font-medium text-gray-800">Continue with Google</Text>
         </TouchableOpacity>
+        <View className="mb-5 mt-6 items-center justify-center">
+          <Text
+            className="font-semibold text-[#1C64F2]"
+            onPress={() => router.push('/auth/(forget)/index')} // replace 'SignIn' with your screen name
+          >
+            Forget Password?
+          </Text>
+        </View>
       </View>
 
       {/* Bottom Sign-in option */}
       <View className="mb-10 mt-6 items-center justify-center">
         <Text className="text-gray-500">
-          Already have an account?{' '}
+          Don't have an account yet?{' '}
           <Text
-            className="font-semibold text-[#111928]"
+            className="font-semibold text-[#1C64F2]"
             onPress={() => navigation.navigate('SignIn' as never)} // replace 'SignIn' with your screen name
           >
-            Sign in
+            Sign up
           </Text>
         </Text>
       </View>
@@ -115,4 +114,4 @@ const router = useRouter();
   );
 };
 
-export default SignUp;
+export default SignIn;
