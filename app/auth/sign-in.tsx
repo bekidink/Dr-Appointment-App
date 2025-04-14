@@ -1,5 +1,5 @@
 import { View, Text, Image, TouchableOpacity } from 'react-native';
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { AppIcon } from '~/constants/images';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -9,7 +9,23 @@ import CustomButton from '~/components/CustomButton';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
+import { useSignIn, useSSO } from '@clerk/clerk-expo';
+import * as WebBrowser from 'expo-web-browser';
+import * as AuthSession from 'expo-auth-session';
+export const useWarmUpBrowser = () => {
+  useEffect(() => {
+    // Preloads the browser for Android devices to reduce authentication load time
+    // See: https://docs.expo.dev/guides/authentication/#improving-user-experience
+    void WebBrowser.warmUpAsync();
+    return () => {
+      // Cleanup: closes browser when component unmounts
+      void WebBrowser.coolDownAsync();
+    };
+  }, []);
+};
 
+// Handle any pending authentication sessions
+WebBrowser.maybeCompleteAuthSession();
 const schema = z.object({
   email: z.string().email('Please enter a valid email'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
@@ -19,7 +35,12 @@ type FormData = z.infer<typeof schema>;
 
 const SignIn = () => {
   const navigation = useNavigation();
-const router = useRouter();
+  const { signIn, setActive, isLoaded } = useSignIn();
+  useWarmUpBrowser();
+
+  const { startSSOFlow } = useSSO();
+
+  const router = useRouter();
   const {
     handleSubmit,
     setValue,
@@ -33,11 +54,60 @@ const router = useRouter();
     },
   });
 
-  const onSubmit = (data: FormData) => {
-    console.log('Submitted', data);
-   router.replace('/auth/profile-onboarding');
-  };
+  const onSubmit = async (data: FormData) => {
+    if (!isLoaded) return;
 
+    // Start the sign-in process using the email and password provided
+    try {
+      const signInAttempt = await signIn.create({
+        identifier: data.email,
+        password: data.password,
+      });
+
+      // If sign-in process is complete, set the created session as active
+      // and redirect the user
+      if (signInAttempt.status === 'complete') {
+        await setActive({ session: signInAttempt.createdSessionId });
+        //  router.replace('/');
+        console.log(signInAttempt);
+      } else {
+        // If the status isn't complete, check why. User might need to
+        // complete further steps.
+        console.error(JSON.stringify(signInAttempt, null, 2));
+      }
+    } catch (err) {
+      // See https://clerk.com/docs/custom-flows/error-handling
+      // for more info on error handling
+      console.error(JSON.stringify(err, null, 2));
+    }
+    
+  };
+  const onPress = useCallback(async () => {
+    try {
+      // Start the authentication process by calling `startSSOFlow()`
+      const { createdSessionId, setActive, signIn, signUp } = await startSSOFlow({
+        strategy: 'oauth_google',
+        // For web, defaults to current path
+        // For native, you must pass a scheme, like AuthSession.makeRedirectUri({ scheme, path })
+        // For more info, see https://docs.expo.dev/versions/latest/sdk/auth-session/#authsessionmakeredirecturioptions
+        redirectUrl: AuthSession.makeRedirectUri(),
+      });
+
+      // If sign in was successful, set the active session
+      if (createdSessionId) {
+        setActive!({ session: createdSessionId });
+      } else {
+        // If there is no `createdSessionId`,
+        // there are missing requirements, such as MFA
+        // Use the `signIn` or `signUp` returned from `startSSOFlow`
+        // to handle next steps
+      }
+    } catch (err) {
+      // See https://clerk.com/docs/custom-flows/error-handling
+      // for more info on error handling
+      console.error(JSON.stringify(err, null, 2));
+    }
+  }, []);
   return (
     <View className="flex-1 bg-white">
       {/* Logo & Titles */}
@@ -79,19 +149,21 @@ const router = useRouter();
         </View>
 
         {/* Social Login Buttons */}
+        <TouchableOpacity
+          onPress={onPress}
+          className="flex-row items-center justify-center rounded-full border border-gray-300 py-3">
+          <Feather name="globe" size={20} color="#DB4437" />
+          <Text className="ml-2 font-medium text-gray-800">Continue with Google</Text>
+        </TouchableOpacity>
         <TouchableOpacity className="mb-3 flex-row items-center justify-center rounded-full border border-gray-300 py-3">
           <Feather name="facebook" size={20} color="#1877F2" />
           <Text className="ml-2 font-medium text-gray-800">Continue with Facebook</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity className="flex-row items-center justify-center rounded-full border border-gray-300 py-3">
-          <Feather name="globe" size={20} color="#DB4437" />
-          <Text className="ml-2 font-medium text-gray-800">Continue with Google</Text>
-        </TouchableOpacity>
         <View className="mb-5 mt-6 items-center justify-center">
           <Text
             className="font-semibold text-[#1C64F2]"
-            onPress={() => router.push('/auth/(forget)/index')} // replace 'SignIn' with your screen name
+            onPress={() => router.push('/auth/(forget)')} // replace 'SignIn' with your screen name
           >
             Forget Password?
           </Text>
@@ -104,7 +176,7 @@ const router = useRouter();
           Don't have an account yet?{' '}
           <Text
             className="font-semibold text-[#1C64F2]"
-            onPress={() => navigation.navigate('SignIn' as never)} // replace 'SignIn' with your screen name
+            onPress={() => router.push('/auth/sign-up')} // replace 'SignIn' with your screen name
           >
             Sign up
           </Text>

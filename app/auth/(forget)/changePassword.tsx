@@ -46,7 +46,7 @@ const ChangePassword = () => {
         <Image source={AppIcon} style={{ width: 50, height: 50 }} resizeMode="contain" />
         <Text className="mt-3 text-2xl font-bold text-[#6B7280]">HealthPal</Text>
         <Text className="mt-5 text-2xl font-bold text-[#1C2A3A]">Create new password </Text>
-        <Text className="mt-2 text-base font-medium text-[#6B7280]">
+        <Text className="mt-2 text-base font-medium text-[#6B7280] mx-3">
           Your new password must be different form previously used password
         </Text>
       </View>

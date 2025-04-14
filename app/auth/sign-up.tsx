@@ -8,8 +8,8 @@ import { InputWithIcon } from '~/components/inputs/InputWithIcon';
 import CustomButton from '~/components/CustomButton';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { useRouter } from 'expo-router';
-
+import { Stack, useRouter } from 'expo-router';
+import { useSignUp } from '@clerk/clerk-expo';
 const schema = z.object({
   email: z.string().email('Please enter a valid email'),
   name: z.string().min(1, 'Name is required'),
@@ -21,6 +21,7 @@ type FormData = z.infer<typeof schema>;
 const SignUp = () => {
   const navigation = useNavigation();
 const router = useRouter();
+ const { isLoaded, signUp, setActive } = useSignUp();
   const {
     handleSubmit,
     setValue,
@@ -35,14 +36,31 @@ const router = useRouter();
     },
   });
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = async (data: FormData) => {
     console.log('Submitted', data);
-   router.replace('/auth/sign-in');
+    try {
+      await signUp?.create({
+        emailAddress:data.email,
+        password:data.password,
+      });
+
+      // Send user an email with verification code
+      await signUp?.prepareEmailAddressVerification({ strategy: 'email_code' });
+router.replace('/auth/verify');
+      // Set 'pendingVerification' to true to display second form
+      // and capture OTP code
+    } catch (err) {
+      // See https://clerk.com/docs/custom-flows/error-handling
+      // for more info on error handling
+      console.error(JSON.stringify(err, null, 2));
+    }
+    
   };
 
   return (
     <View className="flex-1 bg-white">
       {/* Logo & Titles */}
+      <Stack.Screen options={{headerShown:false}}/>
       <View className="mt-16 items-center justify-center">
         <Image source={AppIcon} style={{ width: 50, height: 50 }} resizeMode="contain" />
         <Text className="mt-3 text-2xl font-bold text-[#6B7280]">HealthPal</Text>
@@ -105,7 +123,7 @@ const router = useRouter();
           Already have an account?{' '}
           <Text
             className="font-semibold text-[#111928]"
-            onPress={() => navigation.navigate('SignIn' as never)} // replace 'SignIn' with your screen name
+            onPress={() => router.replace('/auth/sign-in')} // replace 'SignIn' with your screen name
           >
             Sign in
           </Text>
