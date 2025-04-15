@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Image,  TouchableOpacity } from 'react-native';
+import { Image, TouchableOpacity } from 'react-native';
 
 import { AntDesign } from '@expo/vector-icons';
 import { AppointmentIcon, HomeIcon, PersonIcon, SearchIcon } from '~/constants/icons';
@@ -17,9 +17,11 @@ export default function TabLayout() {
         },
       }}>
       <Tabs.Screen
-        name="home"
+        name="index"
         options={{
-          title: 'Home',
+          tabBarLabel: '',
+
+          headerShown: false,
           tabBarHideOnKeyboard: true,
           tabBarIcon: ({ color }) => <Image source={HomeIcon} />,
         }}
@@ -27,7 +29,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="search"
         options={{
-          title: 'Search',
+          tabBarLabel: '',
           tabBarHideOnKeyboard: true,
           tabBarIcon: ({ color }) => <Image source={SearchIcon} />,
         }}
@@ -36,7 +38,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="appointment"
         options={{
-          title: 'Booking',
+          tabBarLabel: '',
           tabBarHideOnKeyboard: true,
           tabBarIcon: ({ color }) => <Image source={AppointmentIcon} />,
         }}
@@ -49,7 +51,7 @@ export default function TabLayout() {
           headerTitleAlign: 'center', // Centers the title
           headerTintColor: 'white', // Makes text white
           headerStyle: { backgroundColor: '#00BBD3' },
-          title: 'Profile',
+          tabBarLabel: '',
           headerLeft: () => (
             <TouchableOpacity>
               <AntDesign name="left" size={24} color="white" />

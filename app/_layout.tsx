@@ -5,7 +5,6 @@ import { tokenCache } from '@clerk/clerk-expo/token-cache';
 import { ActivityIndicator, View, AppState, TouchableWithoutFeedback } from 'react-native';
 import { useEffect, useRef } from 'react';
 
-// 👇 This now wraps the screen content rather than the Stack
 function InactivityHandler({ children }: { children: React.ReactNode }) {
   const { signOut } = useAuth();
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -18,7 +17,7 @@ function InactivityHandler({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    resetTimer(); // start timer
+    resetTimer();
 
     const appStateListener = AppState.addEventListener('change', (state) => {
       if (state === 'active') resetTimer();
@@ -38,9 +37,8 @@ function InactivityHandler({ children }: { children: React.ReactNode }) {
   );
 }
 
-function AuthGate() {
+function RootLayoutNav() {
   const { isLoaded, isSignedIn } = useAuth();
-  console.log('isSignedIn:', isSignedIn);
 
   if (!isLoaded || typeof isSignedIn === 'undefined') {
     return (
@@ -50,41 +48,27 @@ function AuthGate() {
     );
   }
 
+  // This Stack is now valid directly inside Layout
   return (
-    <Stack>
-      {isSignedIn ? (
-        <Stack.Screen
-          name="auth"
-          options={{ headerShown: false }}
-          // Wrap the screen content with InactivityHandler
-          // children={() => (
-          //   <InactivityHandler>
-          //     <View style={{ flex: 1 }} />
-          //   </InactivityHandler>
-          // )}
-        />
-      ) : (
-        <>
-          <Stack.Screen
-            name="(home)"
-            options={{ headerShown: false }}
-            // Wrap the screen content with InactivityHandler
-            // children={() => (
-            //   <InactivityHandler>
-            //     <View style={{ flex: 1 }} />
-            //   </InactivityHandler>
-            // )}
-          />
-        </>
-      )}
-    </Stack>
+    <InactivityHandler>
+      <Stack>
+        {isSignedIn ? (
+          <Stack.Screen name="auth" options={{ headerShown: false }} />
+        ) : (
+          <>
+            <Stack.Screen name="(home)" options={{ headerShown: false }} />
+            <Stack.Screen name="services" options={{ headerShown: false }} />
+          </>
+        )}
+      </Stack>
+    </InactivityHandler>
   );
 }
 
 export default function Layout() {
   return (
     <ClerkProvider tokenCache={tokenCache}>
-      <AuthGate />
+      <RootLayoutNav />
     </ClerkProvider>
   );
 }
