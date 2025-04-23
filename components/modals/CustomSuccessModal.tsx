@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator, Pressable } from 'react-native';
+import { View, Text, ActivityIndicator, Pressable, Image } from 'react-native';
 import Modal from 'react-native-modal';
 import { FontAwesome } from '@expo/vector-icons';
+import { SuccessIcon } from '~/constants/icons';
 
 interface Props {
   isVisible: boolean;
@@ -11,6 +12,7 @@ interface Props {
 }
 
 const CustomSuccessModal = ({ isVisible, message, onClose, isLoading }: Props) => {
+  
   return (
     <Modal
       isVisible={isVisible}
@@ -24,11 +26,12 @@ const CustomSuccessModal = ({ isVisible, message, onClose, isLoading }: Props) =
         {isLoading ? (
           <ActivityIndicator size="large" color="#0000ff" />
         ) : (
-          <FontAwesome name="check-circle" size={50} color="green" />
+          <Image source={SuccessIcon}/>
         )}
-        <Text className="mt-4 text-center text-lg font-semibold">{message}</Text>
-        <Pressable onPress={onClose} className="mt-5 rounded-full bg-blue-500 px-6 py-3">
-          <Text className="text-center text-white">Close</Text>
+        <Text className="mt-4 text-center text-lg font-semibold">Congratulations</Text>
+        <Text className="text-[#6B7280] mt-4 text-center text-lg">{message}</Text>
+        <Pressable onPress={onClose} className="mt-5 rounded-full bg-[#1C2A3A] px-6 py-3">
+          <Text className="text-center text-lg text-white">Done</Text>
         </Pressable>
       </View>
     </Modal>

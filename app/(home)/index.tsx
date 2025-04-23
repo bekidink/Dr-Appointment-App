@@ -15,10 +15,10 @@ const index = () => {
   const [city, setCity] = useState<string | null>('Addis Ababa');
   const [country, setCountry] = useState<string | null>('Ethiopia');
   const [searchQuery, setSearchQuery] = useState('');
- const [services, setServices] = useState<Service[]>([]);
- const [specialities, setSpecialities] = useState<Specialty[]>([]);
- const [loading, setLoading] = useState<boolean>(true);
- const router=useRouter()
+  const [services, setServices] = useState<Service[]>([]);
+  const [specialities, setSpecialities] = useState<Specialty[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const router = useRouter();
   useEffect(() => {
     async function fetchLocationDetails() {
       try {
@@ -43,35 +43,34 @@ const index = () => {
       }
     };
 
-     const fetchSpecialities = async () => {
-       try {
-         setLoading(true);
-         const data = await fetchData<Specialty[]>('admin/specialities');
-         setSpecialities(data);
-       } catch (err: any) {
-         console.error(err.message);
-       } finally {
-         setLoading(false);
-       }
-     };
+    const fetchSpecialities = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchData<Specialty[]>('admin/specialities');
+        setSpecialities(data);
+      } catch (err: any) {
+        console.error(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchLocationDetails();
     fetchServices(); // ✅ call the service fetch here
-    fetchSpecialities()
+    fetchSpecialities();
   }, []);
 
   return (
     <ScrollView className="flex-1">
       <Stack.Screen options={{ headerShown: false }} />
-      <View className="flex flex-row justify-between">
+      <View className="flex flex-row justify-between items-center">
         <View className="mx-2 flex flex-col">
-          <Text>Location</Text>
           <View className="mt-3 flex flex-row items-center">
             <Image source={SearchIcon} />
             <Text className="ml-2 text-[#292D32]">Addis Ababa,</Text>
             <Text className="text-[#292D32]">Ethiopia</Text>
           </View>
         </View>
-        <Image className="mx-5 mt-6" source={NotificationIcon} />
+        <Image className="mx-5 " source={NotificationIcon} />
       </View>
       <SearchInput searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       <ImageTextCarousel />
@@ -97,7 +96,8 @@ const index = () => {
             renderItem={({ item }) => (
               <TouchableOpacity
                 className="m-1 flex-1 items-center rounded-lg bg-white p-2 shadow"
-                style={{ maxWidth: '23%' }} onPress={()=>router.push(`/services/${item.slug}` as never)}>
+                style={{ maxWidth: '23%' }}
+                onPress={() => router.push(`/services/${item.slug}` as never)}>
                 <Image
                   source={{ uri: item.imageUrl }}
                   className="h-12 w-12 rounded-full"
@@ -109,6 +109,7 @@ const index = () => {
               </TouchableOpacity>
             )}
             columnWrapperStyle={{}}
+            
           />
         )}
       </View>
@@ -134,7 +135,8 @@ const index = () => {
             renderItem={({ item }) => (
               <TouchableOpacity
                 className="m-1 flex-1 items-center rounded-lg bg-white p-2 shadow"
-                style={{ maxWidth: '23%' }}>
+                style={{ maxWidth: '23%' }}
+                onPress={() => router.push(`/specialists/${item.slug}` as never)}>
                 {/* <Image
                   source={{ uri: item. }}
                   className="h-12 w-12 rounded-full"

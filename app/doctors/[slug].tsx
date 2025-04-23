@@ -8,7 +8,7 @@ import {
   ScrollView,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { fetchData } from '~/config/fetchData';
 import { DashboardStats, DoctorProfile } from '~/types';
 import ViewMoreText from 'react-native-view-more-text';
@@ -114,7 +114,7 @@ const DoctorDetail = () => {
             // showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ gap: 12 }}
             renderItem={({ item }) => (
-              <TouchableOpacity className="mx-5 rounded-full bg-[#F3F4F6] py-2 px-3">
+              <TouchableOpacity className="mx-5 rounded-full bg-[#F3F4F6] px-3 py-2">
                 <View style={{ alignItems: 'center' }}>
                   <Text style={{ textAlign: 'center', marginTop: 4 }}>{item}</Text>
                 </View>
@@ -129,6 +129,7 @@ const DoctorDetail = () => {
         <TouchableOpacity
           onPress={() => {
             // TODO: handle book appointment logic
+            router.push(`/appointment/${slug}` as never);
           }}
           className="items-center rounded-full bg-[#1C2A3A] py-4">
           <Text className="text-lg font-bold text-white">Book Appointment</Text>

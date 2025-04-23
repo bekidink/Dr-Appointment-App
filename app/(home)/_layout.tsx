@@ -48,15 +48,7 @@ export default function TabLayout() {
         options={{
           headerShown: false,
           tabBarHideOnKeyboard: true,
-          headerTitleAlign: 'center', // Centers the title
-          headerTintColor: 'white', // Makes text white
-          headerStyle: { backgroundColor: '#00BBD3' },
-          tabBarLabel: '',
-          headerLeft: () => (
-            <TouchableOpacity>
-              <AntDesign name="left" size={24} color="white" />
-            </TouchableOpacity>
-          ),
+         
           tabBarIcon: ({ color }) => <Image source={PersonIcon} />,
         }}
       />

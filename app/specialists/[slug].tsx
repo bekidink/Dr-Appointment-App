@@ -10,21 +10,21 @@ import {
 import React, { useEffect, useState } from 'react';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { fetchData } from '~/config/fetchData';
-import { DoctorData } from '~/types';
+import { DoctorData, Specialities } from '~/types';
+import { Ionicons } from '@expo/vector-icons';
 
 const ServiceDetail = () => {
   const { slug: initialSlug } = useLocalSearchParams<{ slug: string }>();
   const [selectedSlug, setSelectedSlug] = useState<string | null>(initialSlug || null);
-  const [service, setService] = useState<any | null>(null);
+  const [specialities, setSpecialities] = useState<any | null>(null);
   const [doctors, setDoctors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
   const fetchServiceDetail = async (slug: string) => {
     try {
       setLoading(true);
-      const data = await fetchData<DoctorData>(`/services/${slug}`);
-      
-      setService(data.services);
+      const data = await fetchData<Specialities>(`specialities/${slug}`);
+       console.log("spe",data)
+      setSpecialities(data.specialities);
       setDoctors(data.doctors || []);
     } catch (error) {
       console.error('Error fetching service detail:', error);
@@ -41,27 +41,36 @@ const ServiceDetail = () => {
 
   return (
     <ScrollView className="flex-1 bg-white">
-      <Stack.Screen options={{ title: initialSlug || 'Service Detail' }} />
+      <Stack.Screen
+        options={{
+          title: initialSlug || 'Service Detail',
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => router.back()} style={{ paddingHorizontal: 16 }}>
+              <Ionicons name="arrow-back" size={24} color="#1C2A3A" />
+            </TouchableOpacity>
+          ),
+        }}
+      />
 
       {loading ? (
         <ActivityIndicator size="large" color="#1C2A3A" className="mt-10" />
       ) : (
         <ScrollView className="px-4 pb-6">
-          <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 8,marginTop:10 }}>All Services</Text>
+          <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 8, marginTop: 10 }}>
+            All Specialists
+          </Text>
           <FlatList
-            data={service || []}
+            data={specialities || []}
             keyExtractor={(item) => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ gap: 12 }}
             renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => setSelectedSlug(item.slug)}>
+              <TouchableOpacity
+                onPress={() => setSelectedSlug(item.slug)}
+                className="items-center rounded-full bg-[#1C2A3A] py-4">
                 <View style={{ alignItems: 'center' }}>
-                  <Image
-                    source={{ uri: item.imageUrl }}
-                    style={{ width: 30, height: 30, borderRadius: 10 }}
-                  />
-                  <Text style={{ textAlign: 'center', marginTop: 4 }}>{item.title}</Text>
+                  <Text className="overflow-clip truncate px-1 text-white">{item.title}</Text>
                 </View>
               </TouchableOpacity>
             )}
@@ -80,7 +89,9 @@ const ServiceDetail = () => {
               scrollEnabled
               nestedScrollEnabled
               renderItem={({ item: doctor }) => (
-                <TouchableOpacity onPress={()=>router.push(`/doctors/${doctor.userId}` as never)} className="mb-4 flex-row items-start gap-4 rounded-lg bg-[#F9FAFB] p-4 shadow-sm" >
+                <TouchableOpacity
+                  onPress={() => router.push(`/doctors/${doctor.userId}` as never)}
+                  className="mb-4 flex-row items-start gap-4 rounded-lg bg-[#F9FAFB] p-4 shadow-sm">
                   <Image
                     source={{ uri: doctor.profilePicture }}
                     className="h-16 w-16 rounded-full"

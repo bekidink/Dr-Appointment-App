@@ -18,7 +18,7 @@ export default function OnboardingScreen() {
       scrollViewRef.current?.scrollTo({ x: width * nextPage, animated: true });
       setCurrentPage(nextPage);
     } else {
-      router.replace('/(home)' as never);
+      router.replace('/auth/sign-in' as never);
     }
   };
 

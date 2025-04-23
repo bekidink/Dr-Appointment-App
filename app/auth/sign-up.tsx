@@ -1,5 +1,4 @@
 import { View, Text, Image, TouchableOpacity } from 'react-native';
-import React from 'react';
 import { AppIcon } from '~/constants/images';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -10,6 +9,8 @@ import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { Stack, useRouter } from 'expo-router';
 import { useSignUp } from '@clerk/clerk-expo';
+import { postData } from '~/config/fetchData';
+import { RegisterDataProps } from '~/types';
 const schema = z.object({
   email: z.string().email('Please enter a valid email'),
   name: z.string().min(1, 'Name is required'),
@@ -20,8 +21,8 @@ type FormData = z.infer<typeof schema>;
 
 const SignUp = () => {
   const navigation = useNavigation();
-const router = useRouter();
- const { isLoaded, signUp, setActive } = useSignUp();
+  const router = useRouter();
+  const { isLoaded, signUp, setActive } = useSignUp();
   const {
     handleSubmit,
     setValue,
@@ -40,13 +41,20 @@ const router = useRouter();
     console.log('Submitted', data);
     try {
       await signUp?.create({
-        emailAddress:data.email,
-        password:data.password,
+        emailAddress: data.email,
+        password: data.password,
       });
 
       // Send user an email with verification code
       await signUp?.prepareEmailAddressVerification({ strategy: 'email_code' });
-router.replace('/auth/verify');
+      const params: RegisterDataProps = {
+        name: data.name,
+        email: data.email,
+
+        password: data.password,
+      };
+      fetchDashboard(params);
+      // router.replace('/auth/verify');
       // Set 'pendingVerification' to true to display second form
       // and capture OTP code
     } catch (err) {
@@ -54,13 +62,22 @@ router.replace('/auth/verify');
       // for more info on error handling
       console.error(JSON.stringify(err, null, 2));
     }
-    
   };
-
+  const fetchDashboard = async (data: RegisterDataProps) => {
+    try {
+      // setLoading(true);
+      const response = await postData(`register`, data);
+      // setStats(data);
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    } finally {
+      // setLoading(false);
+    }
+  };
   return (
     <View className="flex-1 bg-white">
       {/* Logo & Titles */}
-      <Stack.Screen options={{headerShown:false}}/>
+      <Stack.Screen options={{ headerShown: false }} />
       <View className="mt-16 items-center justify-center">
         <Image source={AppIcon} style={{ width: 50, height: 50 }} resizeMode="contain" />
         <Text className="mt-3 text-2xl font-bold text-[#6B7280]">HealthPal</Text>
@@ -95,7 +112,7 @@ router.replace('/auth/verify');
         <CustomButton
           title="Create Account"
           onPress={handleSubmit(onSubmit)}
-          className="mt-4 py-3 rounded-full bg-[#111928]"
+          className="mt-4 rounded-full bg-[#111928] py-3"
         />
 
         {/* Dash Separator */}
