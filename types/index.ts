@@ -240,3 +240,18 @@ export type RegisterDataProps = {
   name: string;
   password: string;
 };
+export const getItem = <T>(data: T[], index: number): T => data[index];
+export const getItemCount = <T>(data: T[]): number => data.length;
+
+export interface RegisterResponse {
+  data: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    token: number;
+    
+  };
+  message: string;
+  status: number;
+}

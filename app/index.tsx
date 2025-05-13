@@ -4,6 +4,7 @@ import { onboardingData } from '~/utils/onboarding-data';
 import { useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { PanGestureHandler } from 'react-native-gesture-handler';
+import { useUser } from '@clerk/clerk-expo';
 
 const { width, height } = Dimensions.get('window');
 
@@ -11,7 +12,8 @@ export default function OnboardingScreen() {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(0);
   const scrollViewRef = useRef<ScrollView>(null);
-
+  const {user}=useUser()
+  console.log("user",user)
   const goToNextPage = () => {
     const nextPage = currentPage + 1;
     if (nextPage < onboardingData.length) {

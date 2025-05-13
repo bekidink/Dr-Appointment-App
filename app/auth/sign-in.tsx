@@ -12,6 +12,17 @@ import { useRouter } from 'expo-router';
 import { useSignIn, useSSO } from '@clerk/clerk-expo';
 import * as WebBrowser from 'expo-web-browser';
 import * as AuthSession from 'expo-auth-session';
+import { postData } from '~/config/fetchData';
+import { RegisterResponse } from '~/types';
+import { useAuthStore } from '~/store/useAuthStore';
+type User = {
+  email: string;
+  id: string;
+  name: string;
+  picture: string | null;
+  role: 'USER' | 'ADMIN'; // Add more roles if needed
+};
+
 export const useWarmUpBrowser = () => {
   useEffect(() => {
     // Preloads the browser for Android devices to reduce authentication load time
@@ -37,7 +48,7 @@ const SignIn = () => {
   const navigation = useNavigation();
   const { signIn, setActive, isLoaded } = useSignIn();
   useWarmUpBrowser();
-
+  const { setUser } = useAuthStore();
   const { startSSOFlow } = useSSO();
 
   const router = useRouter();
@@ -68,9 +79,11 @@ const SignIn = () => {
       // and redirect the user
       if (signInAttempt.status === 'complete') {
         await setActive({ session: signInAttempt.createdSessionId });
-        //  router.replace('/');
-        console.log(signInAttempt);
+        // router.replace('/(home)');
+
+        await fetchDashboard(data.email);
       } else {
+        await fetchDashboard(data.email);
         // If the status isn't complete, check why. User might need to
         // complete further steps.
         console.error(JSON.stringify(signInAttempt, null, 2));
@@ -78,14 +91,14 @@ const SignIn = () => {
     } catch (err) {
       // See https://clerk.com/docs/custom-flows/error-handling
       // for more info on error handling
+      await fetchDashboard(data.email);
       console.error(JSON.stringify(err, null, 2));
     }
-    
   };
   const onPress = useCallback(async () => {
     try {
       // Start the authentication process by calling `startSSOFlow()`
-      const { createdSessionId, setActive, signIn, signUp } = await startSSOFlow({
+      const { createdSessionId, setActive, signIn } = await startSSOFlow({
         strategy: 'oauth_google',
         // For web, defaults to current path
         // For native, you must pass a scheme, like AuthSession.makeRedirectUri({ scheme, path })
@@ -96,6 +109,7 @@ const SignIn = () => {
       // If sign in was successful, set the active session
       if (createdSessionId) {
         setActive!({ session: createdSessionId });
+        router.push('/(home)');
       } else {
         // If there is no `createdSessionId`,
         // there are missing requirements, such as MFA
@@ -108,6 +122,28 @@ const SignIn = () => {
       console.error(JSON.stringify(err, null, 2));
     }
   }, []);
+  const fetchDashboard = async (email: string) => {
+    try {
+      const params={
+        email:email
+      }
+      const response:User = await postData('login', params);
+      console.log('resp', response);
+      if (response) {
+        const data={
+          id:response.id,
+          email:response.email,
+          name:response.name,
+          token:890,
+          role:response.role
+        }
+         setUser(data);
+        router.push('/(home)');
+      }
+    } catch (error) {
+      console.error('Error registering:', error);
+    }
+  };
   return (
     <View className="flex-1 bg-white">
       {/* Logo & Titles */}

@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { View, Text, Dimensions, ImageBackground } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
+import { BannerImg1 } from '~/constants/images';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -9,17 +10,17 @@ const ImageTextCarousel = ({ data = [], width = SCREEN_WIDTH * 0.9, height = 150
 
   const defaultData = [
     {
-      image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e',
+      image: BannerImg1,
       title: 'Beautiful Beach',
       description: 'Relax by the serene ocean waves',
     },
     {
-      image: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606',
+      image: BannerImg1,
       title: 'Majestic Mountains',
       description: 'Explore the breathtaking peaks',
     },
     {
-      image: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e',
+      image: BannerImg1,
       title: 'Lush Forest',
       description: "Discover nature's tranquility",
     },
@@ -41,7 +42,7 @@ const renderItem = ({ item }: any) => (
       elevation: 5,
     }}>
     <ImageBackground
-      source={{ uri: item.image }}
+      source={ item.image }
       resizeMode="cover"
       style={{ flex: 1, width: '100%', height: '100%' }} // Ensure full size
     >

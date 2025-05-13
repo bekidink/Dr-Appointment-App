@@ -52,7 +52,7 @@ function RootLayoutNav() {
   return (
     <InactivityHandler>
       <Stack>
-        {isSignedIn ? (
+        {!isSignedIn ? (
           <Stack.Screen name="auth" options={{ headerShown: false }} />
         ) : (
           <>

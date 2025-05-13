@@ -6,6 +6,11 @@ import { TextInput } from 'react-native';
 import { AppIcon } from '~/constants/images';
 import { Image } from 'react-native';
 import { useSignUp } from '@clerk/clerk-expo';
+import { useLocalSearchParams } from 'expo-router';
+import { RegisterDataProps, RegisterResponse } from '~/types';
+import { postData } from '~/config/fetchData';
+import { useAuthStore } from '~/store/useAuthStore';
+
 const OtpVerificationScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [otp, setOtp] = useState('');
@@ -13,7 +18,16 @@ const OtpVerificationScreen = () => {
   const ref = useRef(null);
 const { isLoaded, signUp, setActive } = useSignUp();
   const CELL_COUNT = 6; // Define the number of OTP digits
-
+  const searchParams = useLocalSearchParams();
+  const email = Array.isArray(searchParams.email)
+    ? searchParams.email[0]
+    : searchParams.email || '';
+  const password = Array.isArray(searchParams.password)
+    ? searchParams.password[0]
+    : searchParams.password || '';
+  const name = Array.isArray(searchParams.name) ? searchParams.name[0] : searchParams.name || '';
+  
+const {setUser}=useAuthStore()
   const handleVerifyOtp = async() => {
     setIsLoading(true);
     if (!isLoaded) return;
@@ -28,7 +42,14 @@ const { isLoaded, signUp, setActive } = useSignUp();
       // and redirect the user
       if (signUpAttempt.status === 'complete') {
         await setActive({ session: signUpAttempt.createdSessionId });
-    //    router.replace('/auth/profile-onboarding');
+        const params: RegisterDataProps = {
+          name: name,
+          email: email,
+          password: password,
+        };
+
+        await fetchDashboard(params);
+        //    router.replace('/auth/profile-onboarding');
       } else {
         // If the status is not complete, check why. User may need to
         // complete further steps.
@@ -47,7 +68,18 @@ const { isLoaded, signUp, setActive } = useSignUp();
       //   router.push('/next-screen'); // Replace with your actual path
     }, 2000);
   };
-
+const fetchDashboard = async (data: RegisterDataProps) => {
+    try {
+      const response: RegisterResponse = await postData('register', data);
+      console.log("resp",response)
+      if (response?.data) {
+        
+        router.push('/(home)');
+      }
+    } catch (error) {
+      console.error('Error registering:', error);
+    }
+  };
   return (
     <View className="flex-1  bg-white p-5">
       <View className="mt-16 items-center justify-center">
