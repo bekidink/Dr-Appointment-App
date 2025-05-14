@@ -62,7 +62,7 @@ const index = () => {
   return (
     <ScrollView className="flex-1">
       <Stack.Screen options={{ headerShown: false }} />
-      <View className="flex flex-row justify-between items-center">
+      <View className="flex flex-row items-center justify-between">
         <View className="mx-2 flex flex-col">
           <View className="mt-3 flex flex-row items-center">
             <Image source={SearchIcon} />
@@ -76,7 +76,7 @@ const index = () => {
       <ImageTextCarousel />
       <View className="mx-5 my-2 flex flex-row items-center justify-between">
         <Text className="text-lg font-bold text-[#1C2A3A]">Categories</Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push(`/services/new` as never)}>
           <Text className="text-[#6B7280]">See All</Text>
         </TouchableOpacity>
       </View>
@@ -109,13 +109,12 @@ const index = () => {
               </TouchableOpacity>
             )}
             columnWrapperStyle={{}}
-            
           />
         )}
       </View>
       <View className="mx-5 my-2 flex flex-row items-center justify-between">
         <Text className="text-lg font-bold text-[#1C2A3A]">Specialists</Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push(`/specialists/All Specialities` as never)}>
           <Text className="text-[#6B7280]">See All</Text>
         </TouchableOpacity>
       </View>

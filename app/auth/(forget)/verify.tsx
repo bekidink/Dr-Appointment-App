@@ -11,43 +11,72 @@ const OtpVerificationScreen = () => {
   const [otp, setOtp] = useState('');
   const router = useRouter();
   const ref = useRef(null);
+  const { resetPassword, setCode, setActive, signIn } = useForgotPassword();
 
   const CELL_COUNT = 6; // Define the number of OTP digits
 
-  const handleVerifyOtp = () => {
+  // Handle OTP verification with Clerk
+  const handleVerifyOtp = async () => {
     setIsLoading(true);
-    setTimeout(() => {
+    try {
+      await setCode(otp); // Set the OTP code
+      await resetPassword(); // Attempt to reset password with the code
+      // On success, navigate to the reset password screen or login
+      router.push('/auth/(forget)/changePassword'); // Replace with your reset password screen path
+    } catch (error:any) {
+      console.error('OTP Verification Error:', error.message);
+      // Handle error (e.g., show an alert or update UI)
+    } finally {
       setIsLoading(false);
-      console.log('OTP Verified:', otp);
-      // Navigate to the next screen upon successful OTP verification
-      //   router.push('/next-screen'); // Replace with your actual path
-    }, 2000);
+    }
+  };
+
+  // Handle resend code (optional, using Clerk's API)
+  const handleResendCode = async () => {
+    setIsLoading(true);
+    try {
+      const completeSignIn = await signIn.attempt({
+        strategy: 'reset_password_email_code',
+        code: otp,
+         // Required if sign-up flow is involved
+      });
+
+      if (completeSignIn.status === 'complete') {
+        await setActive({ session: completeSignIn.createdSessionId }); // Set the session to log the user in
+        router.push('/auth/(forget)/changePassword'); // Navigate to reset password screen
+      } else {
+        console.log('Sign-in status:', completeSignIn.status);
+      }
+    } catch (error:any) {
+      console.error('OTP Verification Error:', error.message);
+      // Handle error (e.g., show alert for invalid code)
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <View className="flex-1  bg-white p-5">
+    <View className="flex-1 bg-white p-5">
       <View className="mt-16 items-center justify-center">
         <Image source={AppIcon} style={{ width: 50, height: 50 }} resizeMode="contain" />
         <Text className="mt-3 text-2xl font-bold text-[#6B7280]">HealthPal</Text>
-        <Text className="mt-5 text-2xl font-bold text-[#1C2A3A]">Verify Code </Text>
+        <Text className="mt-5 text-2xl font-bold text-[#1C2A3A]">Verify Code</Text>
         <Text className="mt-2 text-base font-medium text-[#6B7280]">
-          Enter the the code we just sent you on your registered Email
+          Enter the code we just sent you on your registered Email
         </Text>
       </View>
 
       <View className="mt-5 w-full">
         {/* OTP CodeField */}
-        <CodeField
+        <CodeField  
           ref={ref}
           value={otp}
           onChangeText={setOtp}
           cellCount={CELL_COUNT}
           keyboardType="number-pad"
           textContentType="oneTimeCode"
-          //   autoComplete={Platform.select({ android: 'sms-otp', default: 'one-time-code' })}
-          testID="otp-input"
           rootStyle={{ justifyContent: 'space-between', flexDirection: 'row', width: '100%' }}
-          InputComponent={TextInput} // Ensure to provide the InputComponent
+          InputComponent={TextInput}
           renderCell={({ index, symbol, isFocused }) => (
             <Text
               key={index}
@@ -61,7 +90,7 @@ const OtpVerificationScreen = () => {
                   textAlign: 'center',
                   fontSize: 18,
                 },
-                isFocused && { borderColor: '#111928' }, // Change border color when focused
+                isFocused && { borderColor: '#111928' },
               ]}>
               {symbol || (isFocused ? <Cursor /> : null)}
             </Text>
@@ -81,7 +110,7 @@ const OtpVerificationScreen = () => {
 
       <Text className="mt-4 text-center text-sm text-[#6B7280]">
         Didn't receive the code?{' '}
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleResendCode}>
           <Text className="text-blue-500">Resend</Text>
         </TouchableOpacity>
       </Text>

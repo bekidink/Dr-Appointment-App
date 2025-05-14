@@ -127,10 +127,7 @@ const DoctorDetail = () => {
       {/* Fixed Bottom Button */}
       <View className="absolute bottom-20 left-4 right-4">
         <TouchableOpacity
-          onPress={() => {
-            // TODO: handle book appointment logic
-            router.push(`/appointment/${slug}` as never);
-          }}
+          onPress={() => router.push(`/appointment/${slug}` as never)}
           className="items-center rounded-full bg-[#1C2A3A] py-4">
           <Text className="text-lg font-bold text-white">Book Appointment</Text>
         </TouchableOpacity>

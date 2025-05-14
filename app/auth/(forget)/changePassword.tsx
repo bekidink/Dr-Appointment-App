@@ -1,5 +1,5 @@
 import { View, Text, Image, TouchableOpacity } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import { AppIcon } from '~/constants/images';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -9,6 +9,7 @@ import CustomButton from '~/components/CustomButton';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { Stack, useRouter } from 'expo-router';
+import { useSignIn } from '@clerk/clerk-expo';
 
 const schema = z.object({
   newPassword: z.string().email('Please enter a valid email'),
@@ -32,10 +33,40 @@ const ChangePassword = () => {
       password: '',
     },
   });
+  const { signIn, setActive } = useSignIn();
+  const [error, setError] = useState('');
+  const onSubmit = async(data: FormData) => {
+    if (data.newPassword !== data.newPassword) {
+      setError('Passwords do not match');
+      return;
+    }
 
-  const onSubmit = (data: FormData) => {
-    console.log('Submitted', data);
-    router.replace('/auth/profile-onboarding');
+    if (data.newPassword.length < 8) {
+      setError('Password must be at least 8 characters');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+    try {
+      // Complete the password reset by setting the new password
+      const completeSignIn = await signIn.attempt({
+        strategy: 'reset_password_email_code',
+        password: data.newPassword,
+      });
+
+      if (completeSignIn.status === 'complete') {
+        await s(completeSignIn.createdSessionId); // Log the user in with the new password
+        router.push('/(home)'); // Navigate to home screen after successful reset
+      } else {
+        setError('Failed to reset password. Please try again.');
+      }
+    } catch (error) {
+      console.error('Reset Password Error:', error.message);
+      setError(error.message || 'An error occurred while resetting the password.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

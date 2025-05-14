@@ -6,7 +6,7 @@ interface UserData {
   email: string;
   role: string;
   token: number;
-  
+  image?:string
  
 }
 

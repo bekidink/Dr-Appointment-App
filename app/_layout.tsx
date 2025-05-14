@@ -2,8 +2,9 @@ import '../global.css';
 import { Stack } from 'expo-router';
 import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
 import { tokenCache } from '@clerk/clerk-expo/token-cache';
-import { ActivityIndicator, View, AppState, TouchableWithoutFeedback } from 'react-native';
+import { ActivityIndicator, View, AppState, TouchableWithoutFeedback, SafeAreaView } from 'react-native';
 import { useEffect, useRef } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 function InactivityHandler({ children }: { children: React.ReactNode }) {
   const { signOut } = useAuth();
@@ -42,27 +43,32 @@ function RootLayoutNav() {
 
   if (!isLoaded || typeof isSignedIn === 'undefined') {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" />
-      </View>
+      </SafeAreaView>
     );
   }
 
   // This Stack is now valid directly inside Layout
   return (
-    <InactivityHandler>
-      <Stack>
-        {!isSignedIn ? (
-          <Stack.Screen name="auth" options={{ headerShown: false }} />
-        ) : (
-          <>
-            <Stack.Screen name="(home)" options={{ headerShown: false, title: '' }} />
-            <Stack.Screen name="services" options={{ headerShown: false }} />
-            <Stack.Screen name="specialists" options={{ headerShown: false }} />
-          </>
-        )}
-      </Stack>
-    </InactivityHandler>
+    <SafeAreaProvider>
+      <InactivityHandler>
+        <Stack
+          screenOptions={{
+            headerShown: false, // Set globally for all screens
+          }}>
+          {!isSignedIn ? (
+            <Stack.Screen name="auth" options={{ headerShown: false }} />
+          ) : (
+            <>
+              <Stack.Screen name="(home)" options={{ headerShown: false }} />
+              <Stack.Screen name="services" options={{ headerShown: false }} />
+              <Stack.Screen name="specialists" options={{ headerShown: false }} />
+            </>
+          )}
+        </Stack>
+      </InactivityHandler>
+    </SafeAreaProvider>
   );
 }
 

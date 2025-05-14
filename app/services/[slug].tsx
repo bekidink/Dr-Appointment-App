@@ -6,11 +6,13 @@ import {
   ScrollView,
   FlatList,
   TouchableOpacity,
+  SafeAreaView,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { fetchData } from '~/config/fetchData';
 import { DoctorData } from '~/types';
+import { AntDesign } from '@expo/vector-icons';
 
 const ServiceDetail = () => {
   const { slug: initialSlug } = useLocalSearchParams<{ slug: string }>();
@@ -42,12 +44,22 @@ const ServiceDetail = () => {
   return (
     <ScrollView className="flex-1 bg-white">
       <Stack.Screen options={{ title: initialSlug || 'Service Detail' }} />
-
+      <SafeAreaView className="absolute left-0 right-0 top-0 z-10 mt-4 flex-row items-center gap-x-10  px-4">
+        <TouchableOpacity className="rounded-full bg-white p-2" onPress={() => router.back()}>
+          <AntDesign name="left" size={20} color="#156778" />
+        </TouchableOpacity>
+        <View className="flex-row gap-2 ml-10">
+          <Text className='text-lg'>Service Detail</Text>
+          
+        </View>
+      </SafeAreaView>
       {loading ? (
         <ActivityIndicator size="large" color="#1C2A3A" className="mt-10" />
       ) : (
-        <ScrollView className="px-4 pb-6">
-          <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 8,marginTop:10 }}>All Services</Text>
+        <ScrollView className="px-4 pb-6 mt-16">
+          <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 8, marginTop: 10 }}>
+            All Services
+          </Text>
           <FlatList
             data={service || []}
             keyExtractor={(item) => item.id}
@@ -80,7 +92,9 @@ const ServiceDetail = () => {
               scrollEnabled
               nestedScrollEnabled
               renderItem={({ item: doctor }) => (
-                <TouchableOpacity onPress={()=>router.push(`/doctors/${doctor.userId}` as never)} className="mb-4 flex-row items-start gap-4 rounded-lg bg-[#F9FAFB] p-4 shadow-sm" >
+                <TouchableOpacity
+                  onPress={() => router.push(`/doctors/${doctor.userId}` as never)}
+                  className="mb-4 flex-row items-start gap-4 rounded-lg bg-[#F9FAFB] p-4 shadow-sm">
                   <Image
                     source={{ uri: doctor.profilePicture }}
                     className="h-16 w-16 rounded-full"

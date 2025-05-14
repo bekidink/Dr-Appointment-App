@@ -1,17 +1,14 @@
+import React from 'react';
 import { Tabs } from 'expo-router';
-import { Image, TouchableOpacity } from 'react-native';
-
+import { TouchableOpacity } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
-import { AppointmentIcon, HomeIcon, PersonIcon, SearchIcon } from '~/constants/icons';
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        // tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: false,
-        // tabBarButton: HapticTab,
-        // tabBarBackground: TabBarBackground,
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
           backgroundColor: '#E9F6FE',
         },
@@ -20,36 +17,38 @@ export default function TabLayout() {
         name="index"
         options={{
           tabBarLabel: '',
-
           headerShown: false,
-          tabBarHideOnKeyboard: true,
-          tabBarIcon: ({ color }) => <Image source={HomeIcon} />,
+          tabBarIcon: ({ color, focused }) => (
+            <AntDesign name="home" size={30} color={focused ? '#1E90FF' : '#888'} />
+          ),
         }}
       />
       <Tabs.Screen
         name="search"
         options={{
           tabBarLabel: '',
-          tabBarHideOnKeyboard: true,
-          tabBarIcon: ({ color }) => <Image source={SearchIcon} />,
+          tabBarIcon: ({ color, focused }) => (
+            <AntDesign name="search1" size={30} color={focused ? '#1E90FF' : '#888'} />
+          ),
         }}
       />
-
       <Tabs.Screen
         name="appointment"
         options={{
           tabBarLabel: '',
-          tabBarHideOnKeyboard: true,
-          tabBarIcon: ({ color }) => <Image source={AppointmentIcon} />,
+          tabBarIcon: ({ color, focused }) => (
+            <AntDesign name="calendar" size={30} color={focused ? '#1E90FF' : '#888'} />
+          ),
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           headerShown: false,
-          tabBarHideOnKeyboard: true,
-         
-          tabBarIcon: ({ color }) => <Image source={PersonIcon} />,
+          tabBarLabel: '',
+          tabBarIcon: ({ color, focused }) => (
+            <AntDesign name="user" size={30} color={focused ? '#1E90FF' : '#888'} />
+          ),
         }}
       />
     </Tabs>

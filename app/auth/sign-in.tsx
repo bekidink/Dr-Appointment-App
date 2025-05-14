@@ -135,7 +135,8 @@ const SignIn = () => {
           email:response.email,
           name:response.name,
           token:890,
-          role:response.role
+          role:response.role,
+          image:response.picture!
         }
          setUser(data);
         router.push('/(home)');

@@ -11,18 +11,18 @@ const ImageTextCarousel = ({ data = [], width = SCREEN_WIDTH * 0.9, height = 150
   const defaultData = [
     {
       image: BannerImg1,
-      title: 'Beautiful Beach',
-      description: 'Relax by the serene ocean waves',
+      title: 'Looking for Specialist Doctors?',
+      description: 'Schedule an appointment with our top doctors.',
     },
     {
       image: BannerImg1,
-      title: 'Majestic Mountains',
-      description: 'Explore the breathtaking peaks',
+      title: 'Looking for Specialist Doctors?',
+      description: 'Schedule an appointment with our top doctors.',
     },
     {
       image: BannerImg1,
-      title: 'Lush Forest',
-      description: "Discover nature's tranquility",
+      title: 'Looking for Specialist Doctors?',
+      description: 'Schedule an appointment with our top doctors.',
     },
   ];
 
